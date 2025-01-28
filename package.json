@@ -15,7 +15,8 @@
     "libphonenumber-js": "^1.11.18",
     "phone": "^3.1.57",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-phone-number-input": "^3.4.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

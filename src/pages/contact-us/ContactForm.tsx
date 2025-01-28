@@ -4,8 +4,11 @@ import { Country } from "country-state-city";
 import CityField from "../../components/contact-us/formFields/CityField";
 import { CustomValidator, IFormData, initialValues } from "./constants";
 import { CountryCode, getExampleNumber } from "libphonenumber-js";
+import parsePhoneNumber from "libphonenumber-js";
 import examples from "libphonenumber-js/examples.mobile.json";
 import { createContact } from "../../services/contactApi";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
 interface Iprops {
   submissionStatus?: boolean;
   onSubmitStatus: (val: boolean) => void;
@@ -14,31 +17,33 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
   const [state, setState] = useState<IFormData>(
     JSON.parse(JSON.stringify(initialValues))
   );
+  const [errors, setErrors] = useState<IFormData>(
+    JSON.parse(JSON.stringify(initialValues))
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [phoneCode, setPhoneCode] = useState("91");
-  const [phoneNumberMaxLength, setPhoneNumberMaxLength] = useState(10);
+  const [phoneNumberMaxLength, setPhoneNumberMaxLength] = useState(15);
 
-  const [errors, setErrors] = useState(initialValues);
-
-  const validateField = (fieldName: keyof IFormData, value?: string) => {
+  const validateField = (
+    fieldName: keyof IFormData,
+    value?: string,
+    apply = true
+  ) => {
     const validator = CustomValidator.find((f) => f.fieldName === fieldName);
     let message = "";
-    const val =
-      fieldName === "phone" && state.phone.length
-        ? `+${phoneCode}${state[fieldName]}`
-        : state[fieldName];
+    const val = state[fieldName];
     if (validator && !validator.validate(value || val)) {
       message = `${validator.label} is not valid`;
     }
-    setErrors((pre) => ({
-      ...pre,
-      [fieldName]: message,
-    }));
+    apply &&
+      setErrors((pre) => ({
+        ...pre,
+        [fieldName]: message,
+      }));
     return !message.length;
   };
 
-  const onBlur = (fieldName: keyof IFormData) => {
-    validateField(fieldName);
+  const onBlur = (fieldName: keyof IFormData, v?: string) => {
+    validateField(fieldName, v);
   };
 
   const validateForm = () => {
@@ -58,12 +63,12 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
     }
     setIsSubmitting(true);
     try {
-      const phone = state.phone.length ? `+${phoneCode} ${state.phone}` : "";
+      const phone = parsePhoneNumber(state.phone)?.formatInternational() || "";
       const { data } = await createContact({
         ...state,
         phone,
       });
-      console.log(data)
+      console.log(data);
       onSubmitStatus(true);
     } catch (error) {
       console.log(error);
@@ -77,32 +82,32 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
     setState((pre) => {
       return { ...pre, [e.target.name]: e.target.value };
     });
+    if (
+      errors[e.target.name as keyof IFormData] &&
+      validateField(e.target.name as any, e.target.value, false)
+    ) {
+      validateField(e.target.name as any, e.target.value);
+    }
   };
 
   const initState = () => {
     const copyState: IFormData = JSON.parse(JSON.stringify(initialValues));
     copyState.country = "IN";
     setState(copyState);
+    setErrors(JSON.parse(JSON.stringify(initialValues)));
+    setPhoneNumberMaxLength(15);
   };
 
-  const onChangePhoneCode = (phoneCode: string) => {
-    const countryCode = Country.getAllCountries().find(
-      (c) => c.phonecode === phoneCode
-    )?.isoCode as CountryCode;
-    if (!countryCode) return;
-    const domeNumber = getExampleNumber(countryCode, examples)
-      ?.formatInternational()
-      .split(" ")
-      .slice(1)
-      .join()
-      .split(",")
-      .join("");
+  const onChangePhoneCode = (code?: CountryCode) => {
+    if (!code) return;
+    const domeNumber = getExampleNumber(code, examples)?.formatInternational();
     domeNumber?.length && setPhoneNumberMaxLength(domeNumber.length);
+    onChange({ target: { value: code, name: "country" } } as any);
   };
-
   useEffect(() => {
     initState();
   }, []);
+  console.log("keeej");
   return (
     <form
       onSubmit={onSubmit}
@@ -113,7 +118,6 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
       <div className="row">
         <div className="col-md-6 form-group">
           <input
-            required
             type="text"
             className="form-control"
             name="firstName"
@@ -132,7 +136,6 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
         </div>
         <div className="col-md-6 form-group">
           <input
-            required
             type="text"
             className="form-control"
             name="lastName"
@@ -153,7 +156,6 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
       <div className="row">
         <div className="col-md-12 form-group">
           <input
-            required
             type="text"
             className="form-control"
             name="email"
@@ -172,38 +174,12 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
         </div>
       </div>
       <div className="row">
-        <div className="col-3 form-group pr-0">
-          <select
-            disabled={isSubmitting}
-            value={phoneCode}
-            onChange={(e) => {
-              setPhoneCode(e.target.value);
-              onChangePhoneCode(e.target.value);
-              state.phone.length &&
-                validateField("phone", `+${e.target.value} ${state.phone}`);
-            }}
-            name="phoneCode"
-            id="phoneCode"
-            className="form-control"
-          >
-            {Country.sortByIsoCode(Country.getAllCountries()).map(
-              (country, i) => {
-                return (
-                  <option key={i} value={country.phonecode}>
-                    {country.isoCode} {country.phonecode}
-                  </option>
-                );
-              }
-            )}
-          </select>
-          <label
-            htmlFor="phoneCode"
-            id="phoneCode-error"
-            className="error"
-          ></label>
-        </div>
-        <div className="col-9 form-group">
-          <input
+        <div className="col-md-12 form-group">
+          <PhoneInput
+            numberInputProps={{ style: { outline: "none", border: "none" } }}
+            onCountryChange={(c) => onChangePhoneCode(c)}
+            international
+            defaultCountry={"IN"}
             disabled={isSubmitting}
             type="text"
             className="form-control"
@@ -211,7 +187,9 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
             id="phone"
             maxLength={phoneNumberMaxLength}
             placeholder="Phone"
-            onChange={onChange}
+            onChange={(value) =>
+              onChange({ target: { value: value || "", name: "phone" } } as any)
+            }
             onBlur={() => onBlur("phone")}
             value={state.phone}
           />
@@ -226,7 +204,6 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
         <div className="col-md-6 form-group">
           <select
             disabled={isSubmitting}
-            required
             value={state.country}
             onChange={onChange}
             onBlur={() => onBlur("country")}
@@ -269,7 +246,6 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
         <div className="col-md-12 form-group">
           <textarea
             disabled={isSubmitting}
-            required
             minLength={5}
             className="form-control"
             name="message"
@@ -292,6 +268,7 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
       <div className="row">
         <div className="col-md-12 pt-3">
           <button
+            onClick={() => validateForm()}
             disabled={isSubmitting}
             type="submit"
             className="btn btn-primary rounded-0 py-2 px-4"
@@ -314,8 +291,9 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
               </>
             )}
           </button>
-          {submissionStatus === false && 
-          <span className="submitting">Oops something went wrong!</span>}
+          {submissionStatus === false && (
+            <span className="submitting">Oops something went wrong!</span>
+          )}
         </div>
       </div>
     </form>

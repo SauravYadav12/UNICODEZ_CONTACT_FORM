@@ -14,10 +14,12 @@ const CityField = ({ country, value, disabled, onChange, onBlur }: IProps) => {
     <>
       {myCities?.length ? (
         <select
-          required
           disabled={disabled}
           value={value}
-          onChange={onChange}
+          onChange={(e) => {
+            onChange(e);
+            onBlur("city",e.target.value);
+          }}
           onBlur={() => onBlur("city")}
           name="city"
           id="city"

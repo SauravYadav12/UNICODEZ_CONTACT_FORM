@@ -15,11 +15,21 @@ const ContactUs = () => {
                   Connect with us. <br /> It's easy.
                 </h2>
                 {!submissionStatus && (
-                  <ContactForm submissionStatus={submissionStatus} onSubmitStatus={setSubmissionStatus} />
+                  <ContactForm
+                    submissionStatus={submissionStatus}
+                    onSubmitStatus={setSubmissionStatus}
+                  />
                 )}
                 {submissionStatus && (
-                  <div id="form-message-success" style={{padding:'50px 0px' }}>
-                    Your message was sent, thank you!
+                  <div id="form-message-success">
+                    <p>Your message was sent, thank you!</p>
+                    <button
+                      onClick={() => setSubmissionStatus(undefined)}
+                      type="button"
+                      className="btn btn-success rounded-0 py-2 px-4"
+                    >
+                      Resend
+                    </button>
                   </div>
                 )}
               </div>
