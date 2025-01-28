@@ -21,7 +21,7 @@ const ContactUs = () => {
                   />
                 )}
                 {submissionStatus && (
-                  <div id="form-message-success">
+                  <div id="form-message-success" style={{padding:'20px 0px'}}>
                     <p>Your message was sent, thank you!</p>
                     <button
                       onClick={() => setSubmissionStatus(undefined)}

@@ -64,11 +64,10 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
     setIsSubmitting(true);
     try {
       const phone = parsePhoneNumber(state.phone)?.formatInternational() || "";
-      const { data } = await createContact({
+      await createContact({
         ...state,
         phone,
       });
-      console.log(data);
       onSubmitStatus(true);
     } catch (error) {
       console.log(error);
@@ -102,12 +101,10 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
     if (!code) return;
     const domeNumber = getExampleNumber(code, examples)?.formatInternational();
     domeNumber?.length && setPhoneNumberMaxLength(domeNumber.length);
-    onChange({ target: { value: code, name: "country" } } as any);
   };
   useEffect(() => {
     initState();
   }, []);
-  console.log("keeej");
   return (
     <form
       onSubmit={onSubmit}
@@ -282,7 +279,7 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
               <>
                 <div
                   className="spinner-border text-secondry"
-                  style={{ width: "1rem", height: "1rem" }}
+                  style={{ width: "1rem", height: "1rem",borderWidth:'0.15em' }}
                   role="status"
                 >
                   <span className="visually-hidden"></span>
