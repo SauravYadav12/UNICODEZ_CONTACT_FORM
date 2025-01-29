@@ -91,7 +91,7 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
 
   const initState = () => {
     const copyState: IFormData = JSON.parse(JSON.stringify(initialValues));
-    copyState.country = "IN";
+    copyState.country = "US";
     setState(copyState);
     setErrors(JSON.parse(JSON.stringify(initialValues)));
     setPhoneNumberMaxLength(15);
@@ -181,7 +181,7 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
             numberInputProps={{ style: { outline: "none", border: "none" } }}
             onCountryChange={(c) => onChangePhoneCode(c)}
             international
-            defaultCountry={"IN"}
+            defaultCountry={"US"}
             disabled={isSubmitting}
             type="text"
             className="form-control"
