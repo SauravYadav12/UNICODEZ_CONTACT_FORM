@@ -98,9 +98,14 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
   };
 
   const onChangePhoneCode = (code?: CountryCode) => {
-    if (!code) return;
-    const domeNumber = getExampleNumber(code, examples)?.formatInternational();
-    domeNumber?.length && setPhoneNumberMaxLength(domeNumber.length);
+    console.log(phoneNumberMaxLength);
+    if (!code) {
+      setPhoneNumberMaxLength(25);
+      return;
+    }
+    const dommyNumber = getExampleNumber(code, examples)?.formatInternational();
+    dommyNumber?.length && setPhoneNumberMaxLength(dommyNumber.length);
+    console.log(dommyNumber);
   };
   useEffect(() => {
     initState();
@@ -279,7 +284,11 @@ const ContactForm = ({ submissionStatus, onSubmitStatus }: Iprops) => {
               <>
                 <div
                   className="spinner-border text-secondry"
-                  style={{ width: "1rem", height: "1rem",borderWidth:'0.15em' }}
+                  style={{
+                    width: "1rem",
+                    height: "1rem",
+                    borderWidth: "0.15em",
+                  }}
                   role="status"
                 >
                   <span className="visually-hidden"></span>

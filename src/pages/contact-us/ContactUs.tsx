@@ -21,7 +21,10 @@ const ContactUs = () => {
                   />
                 )}
                 {submissionStatus && (
-                  <div id="form-message-success" style={{padding:'20px 0px'}}>
+                  <div
+                    id="form-message-success"
+                    style={{ padding: "20px 0px" }}
+                  >
                     <p>Your message was sent, thank you!</p>
                     <button
                       onClick={() => setSubmissionStatus(undefined)}
@@ -34,14 +37,19 @@ const ContactUs = () => {
                 )}
               </div>
               <div className="col-lg-4 ml-auto">
-                <h3 className="mb-4">Let's talk about Us.</h3>
+                <h3
+                  className="m-0 pl-1"
+                  style={{ color: "#032840", fontSize: "2.2rem" }}
+                >
+                  Let's talk !
+                </h3>
                 <Image />
-                <p>
+                <p className="pl-1">
                   Unicodez is a team of diverse software-development & global-IT
                   professionals. We provide software consulting services and
                   solutions for businesses and organizations all over the world!
                 </p>
-                <p>
+                <p className="pl-1">
                   <a href="https://www.unicodez.com/" target="_blank">
                     Read more
                   </a>
